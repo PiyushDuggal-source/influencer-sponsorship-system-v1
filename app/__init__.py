@@ -14,12 +14,12 @@ def create_app(config_class=Config):
     csrf.init_app(app)
 
     # Register blueprints
-    from app.views import auth, sponsor, influencer, admin
+    from .views import auth, sponsor, influencer, admin, main
 
     app.register_blueprint(auth.auth)
     app.register_blueprint(sponsor.sponsor)
-    # app.register_blueprint(influencer)
-    # app.register_blueprint(admin.bp)
+    app.register_blueprint(influencer.influencer)
+    app.register_blueprint(main.main)
 
     # Register API resources
     api_ref.add_resource(CampaignListAPI, "/api/campaigns")
