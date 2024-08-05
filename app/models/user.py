@@ -17,5 +17,5 @@ class User(db.Model):
 
 
 @login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(user):
+    return User.query.get(int(user))
