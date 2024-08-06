@@ -1,0 +1,112 @@
+{% extends "base.html" %} {% block title %} Admin Dashboard {% endblock %} {%
+block content %}
+<h1 class="text-center mt-5 mb-5">Admin Dashboard</h1>
+
+<main class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>User Statistics</h2>
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Total Users
+          <span class="badge bg-primary rounded-pill">{{ stats.total_users }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Active Users
+          <span class="badge bg-primary rounded-pill">{{ stats.active_users }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Flagged Users
+          <span class="badge bg-danger rounded-pill">{{ stats.flagged_users }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-md-6">
+      <h2>Campaign Statistics</h2>
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Total Campaigns
+          <span class="badge bg-primary rounded-pill">{{ stats.total_campaigns }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Public Campaigns
+          <span class="badge bg-success rounded-pill" id="public-campaigns">{{ stats.public_campaigns }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Private Campaigns
+          <span class="badge bg-warning rounded-pill" id="private-campaigns">{{ stats.private_campaigns }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <h2>Ad Request Statistics</h2>
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Total Ad Requests
+          <span class="badge bg-primary rounded-pill">{{ stats.total_ad_requests }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Pending Ad Requests
+          <span class="badge bg-warning rounded-pill">{{ stats.pending_ad_requests }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Accepted Ad Requests
+          <span class="badge bg-success rounded-pill">{{ stats.accepted_ad_requests }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Rejected Ad Requests
+          <span class="badge bg-danger rounded-pill">{{ stats.rejected_ad_requests }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-5 mx-auto">
+      <canvas id="campaignChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let publicCampaigns = document.getElementById("public-campaigns");
+  let privateCampaigns = document.getElementById("private-campaigns");
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var ctx = document.getElementById("campaignChart").getContext("2d");
+    var myChart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: ["Public Campaigns", "Private Campaigns"],
+        datasets: [
+          {
+            data: [20, 30],
+            backgroundColor: [
+              "rgba(75, 192, 192, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+            ],
+            borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 206, 86, 1)"],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "Campaign Distribution",
+          },
+        },
+      },
+    });
+  });
+</script>
+{% endblock %}

@@ -6,7 +6,7 @@
   {% if messages %}
     <div class="flash-messages">
     {% for category, message in messages %}
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
         {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
@@ -30,6 +30,14 @@
             <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
             <label for="floatingPassword">Password</label>
           </div>
+
+        <select class="form-select" aria-label="Default select example" name="role" id="role" required>
+          <option value="sponsor" selected>Sponsor</option>
+          <option value="influencer">Influencer</option>
+          <option value="admin">Admin</option>
+        </select>
+
+
           <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
         </form>
       </main>

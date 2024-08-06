@@ -11,24 +11,24 @@ auth = Blueprint("auth", __name__)
 def login():
     # Login logic here
     if current_user.is_authenticated:
-        return redirect(url_for("main.index"))  # Redirect if user is already logged in
+        return redirect(url_for("main.home"))  # Redirect if user is already logged in
 
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        print(username, password)
+        role = request.form.get("role")
 
-        users = User.query.all()
-        print("users", users)
+        print(username, password, role)
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username, role=role).first()
         print(user)
 
         if user and user.check_password(password):
             login_user(user)
             flash("Logged in successfully.", "success")
+            return redirect(url_for("main.home"))
         else:
-            flash("Invalid username or password.", "error")
+            flash("Invalid username or password.", "danger")
 
     return render_template("login.html", csrf_token=generate_csrf())
 
@@ -41,29 +41,31 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
-        print(username, email, password, confirm_password)
+        role = request.form.get("role")
+        print(username, email, password, confirm_password, role)
 
         user_by_username = User.query.filter_by(username=username).first()
+
+        if password != confirm_password:
+            flash("Passwords do not match", "warning")
+            return redirect(url_for("auth.register"))
+
         if user_by_username:
-            flash("Username already exists")
+            flash("Username already exists", "warning")
             return redirect(url_for("auth.register"))
 
         user_by_email = User.query.filter_by(email=email).first()
         if user_by_email:
-            flash("Email address already exists")
+            flash("Email address already exists", "warning")
             return redirect(url_for("auth.register"))
 
-        if password != confirm_password:
-            flash("Passwords do not match")
-            return redirect(url_for("auth.register"))
-
-        new_user = User(username=username, email=email, role="user")
+        new_user = User(username=username, email=email, role=role)
         new_user.set_password(password)
 
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Registration successful. Please log in.")
+        flash("Registration successful. Please log in.", "success")
         return redirect(url_for("auth.login"))
 
     return render_template("signup.html", csrf_token=generate_csrf())
@@ -79,7 +81,6 @@ def debug_users():
 
 
 @auth.route("/logout")
-@login_required
 def logout():
     logout_user()
-    return redirect(url_for("main.index"))
+    return redirect(url_for("main.home"))

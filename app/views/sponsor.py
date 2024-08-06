@@ -8,7 +8,9 @@ sponsor = Blueprint("sponsor", __name__)
 
 @sponsor.route("/dashboard")
 @login_required
-def dashboard():
+def sponsor_dashboard():
+    if current_user.role == "admin":
+        return redirect(url_for("admin.dashboard"))
     campaigns = Campaign.query.filter_by(sponsor_id=current_user.id).all()
     return render_template("sponsor/dashboard.html", campaigns=campaigns)
 

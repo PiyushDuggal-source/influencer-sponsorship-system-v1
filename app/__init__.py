@@ -20,7 +20,7 @@ def create_app(config_class=Config):
     app.register_blueprint(sponsor.sponsor)
     app.register_blueprint(influencer.influencer)
     app.register_blueprint(main.main)
-    # app.register_blueprint(admin)
+    app.register_blueprint(admin.admin)
 
     # # Register API resources
     # api_ref.add_resource(CampaignListAPI, "/api/campaigns")
