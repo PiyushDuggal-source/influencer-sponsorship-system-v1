@@ -6,8 +6,11 @@ from wtforms import (
     TextAreaField,
     FloatField,
     DateField,
+    SelectField,
+    IntegerField,
 )
-from wtforms.validators import DataRequired, Email, EqualTo
+
+from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange
 
 
 class LoginForm(FlaskForm):
@@ -27,9 +30,33 @@ class RegistrationForm(FlaskForm):
 
 
 class CampaignForm(FlaskForm):
-    name = StringField("Campaign Name", validators=[DataRequired()])
+    name = StringField("Campaign Name", validators=[DataRequired(), Length(max=100)])
     description = TextAreaField("Description", validators=[DataRequired()])
     start_date = DateField("Start Date", validators=[DataRequired()])
     end_date = DateField("End Date", validators=[DataRequired()])
-    budget = FloatField("Budget", validators=[DataRequired()])
-    submit = SubmitField("Create Campaign")
+    budget = FloatField("Budget", validators=[DataRequired(), NumberRange(min=0)])
+    niche = SelectField(
+        "Niche",
+        choices=[
+            ("technology", "Technology"),
+            ("fashion", "Fashion"),
+            ("food", "Food"),
+            ("travel", "Travel"),
+            ("fitness", "Fitness"),
+            ("beauty", "Beauty"),
+            ("gaming", "Gaming"),
+            ("other", "Other"),
+        ],
+        validators=[DataRequired()],
+    )
+    visibility = SelectField(
+        "Visibility", choices=[("public", "Public"), ("private", "Private")]
+    )
+
+
+class AdRequestForm(FlaskForm):
+    influencer_id = IntegerField("Influencer ID", validators=[DataRequired()])
+    requirements = TextAreaField("Requirements", validators=[DataRequired()])
+    payment_amount = FloatField(
+        "Payment Amount", validators=[DataRequired(), NumberRange(min=0)]
+    )

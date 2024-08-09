@@ -9,6 +9,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False)
+    campaigns = db.relationship('Campaign', back_populates='sponsor')
     # flagged = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
