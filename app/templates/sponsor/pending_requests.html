@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Pending Ad Requests</h2>
+
+{% if requests %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Campaign</th>
+                <th>Sponsor</th>
+                <th>Requirements</th>
+                <th>Payment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.campaign.name }}</td>
+                <td>{{ request.campaign.sponsor.username }}</td>
+                <td>{{ request.requirements }}</td>
+                <td>${{ request.payment_amount }}</td>
+                <td>
+                    <form action="{{ url_for('sponsor.handle_request', request_id=request.id) }}" method="POST" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" name="action" value="accept" class="btn btn-success btn-sm">Accept</button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No pending ad requests at the moment.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const action = e.submitter.value;
+            if (confirm(`Are you sure you want to ${action} this ad request?`)) {
+                this.submit();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

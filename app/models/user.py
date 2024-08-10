@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     )
 
     category = db.Column(db.String(50))
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

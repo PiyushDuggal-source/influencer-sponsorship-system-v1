@@ -1,6 +1,5 @@
 from flask import Flask
 from app.extensions import db, login_manager, csrf, api_ref
-from app.api.campaigns import CampaignListAPI, CampaignAPI
 from config import Config
 
 
@@ -25,9 +24,4 @@ def create_app(config_class=Config):
     with app.app_context():
         db.create_all()
 
-    # # Register API resources
-    # api_ref.add_resource(CampaignListAPI, "/api/campaigns")
-    # api_ref.add_resource(CampaignAPI, "/api/campaigns/<int:campaign_id>")
-    #
-    # api_ref.init_app(app)
     return app

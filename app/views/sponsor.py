@@ -7,6 +7,7 @@ from app.extensions import db
 from app.forms import CampaignForm, InfluencerSearchForm, AdRequestForm
 from flask_wtf.csrf import generate_csrf
 from sqlalchemy import func
+from datetime import datetime
 
 sponsor = Blueprint("sponsor", __name__)
 
@@ -119,13 +120,16 @@ def send_ad_request(campaign_id, influencer_id):
 
     form = AdRequestForm()
 
+    sponsor_id = campaign.sponsor_id
+
     if form.validate_on_submit():
         ad_request = AdRequest(
             campaign_id=campaign_id,
-            influencer_id=influencer_id,
+            user_id=current_user.id,
             requirements=form.requirements.data,
             payment_amount=form.payment_amount.data,
-            status="Pending",
+            status="pending",
+            applied_by="sponsor",
         )
         db.session.add(ad_request)
         db.session.commit()
@@ -168,39 +172,46 @@ def select_campaign(influencer_id):
         csrf_token=generate_csrf(),
     )
 
+
 @sponsor.route("/stats")
 @login_required
 def stats():
     # Get all campaigns for the current sponsor
     campaigns = Campaign.query.filter_by(sponsor_id=current_user.id).all()
-    
+
     # Get total number of campaigns
     total_campaigns = len(campaigns)
-    
+
     # Get total budget across all campaigns
     total_budget = sum(campaign.budget for campaign in campaigns)
-    
+
     # Get total number of ad requests
-    total_ad_requests = AdRequest.query.join(Campaign).filter(Campaign.sponsor_id == current_user.id).count()
-    
+    total_ad_requests = (
+        AdRequest.query.join(Campaign)
+        .filter(Campaign.sponsor_id == current_user.id)
+        .count()
+    )
+
     # Get ad requests by status
-    ad_requests_by_status = db.session.query(
-        AdRequest.status, 
-        func.count(AdRequest.id)
-    ).join(Campaign).filter(
-        Campaign.sponsor_id == current_user.id
-    ).group_by(AdRequest.status).all()
-    
+    ad_requests_by_status = (
+        db.session.query(AdRequest.status, func.count(AdRequest.id))
+        .join(Campaign)
+        .filter(Campaign.sponsor_id == current_user.id)
+        .group_by(AdRequest.status)
+        .all()
+    )
+
     # Get top 5 campaigns by number of ad requests
-    top_campaigns = db.session.query(
-        Campaign.name, 
-        func.count(AdRequest.id).label('request_count')
-    ).join(AdRequest).filter(
-        Campaign.sponsor_id == current_user.id
-    ).group_by(Campaign.id).order_by(
-        func.count(AdRequest.id).desc()
-    ).limit(5).all()
-    
+    top_campaigns = (
+        db.session.query(Campaign.name, func.count(AdRequest.id).label("request_count"))
+        .join(AdRequest)
+        .filter(Campaign.sponsor_id == current_user.id)
+        .group_by(Campaign.id)
+        .order_by(func.count(AdRequest.id).desc())
+        .limit(5)
+        .all()
+    )
+
     return render_template(
         "sponsor/stats.html",
         user=current_user,
@@ -208,5 +219,58 @@ def stats():
         total_budget=total_budget,
         total_ad_requests=total_ad_requests,
         ad_requests_by_status=dict(ad_requests_by_status),
-        top_campaigns=top_campaigns
+        top_campaigns=top_campaigns,
     )
+
+
+@sponsor.route("/pending_requests")
+@login_required
+def view_pending_requests():
+    if current_user.role != "sponsor":
+        flash("Access restricted. Influencer status required.", "warning")
+        return redirect(url_for("main.home"))
+
+    pending_requests = (
+        AdRequest.query.filter_by(
+            applied_for=current_user.id, status="pending", applied_by="influencer"
+        )
+        .join(Campaign)
+        .all()
+    )
+
+    return render_template(
+        "sponsor/pending_requests.html",
+        requests=pending_requests,
+        user=current_user,
+        csrf_token=generate_csrf(),
+    )
+
+
+@sponsor.route("/handle_request/<int:request_id>", methods=["POST"])
+@login_required
+def handle_request(request_id):
+    if current_user.role != "sponsor":
+        flash("Access restricted. Influencer status required.", "warning")
+        return redirect(url_for("main.main"))
+
+    ad_request = AdRequest.query.get_or_404(request_id)
+
+    if ad_request.applied_for != current_user.id:
+        flash("You don't have permission to modify this request.", "danger")
+        return redirect(url_for("sponsor.view_pending_requests"))
+
+    action = request.form.get("action")
+
+    if action == "accept":
+        ad_request.status = "accepted"
+        ad_request.response_date = datetime.utcnow()
+        flash("Ad request accepted successfully.", "success")
+    elif action == "reject":
+        ad_request.status = "rejected"
+        ad_request.response_date = datetime.utcnow()
+        flash("Ad request rejected.", "info")
+    else:
+        flash("Invalid action specified.", "danger")
+
+    db.session.commit()
+    return redirect(url_for("sponsor.view_pending_requests"))

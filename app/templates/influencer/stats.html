@@ -1,38 +1,55 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2>Influencer Statistics</h2>
+<div class="container mt-4">
+  <h2>Influencer Performance Overview</h2>
 
-<div class="stats-container">
-    <div class="stat-box">
-        <h3>Total Ad Requests</h3>
-        <p>{{ total_requests }}</p>
+  <div class="row text-center my-4">
+    <div class="col-md-3">
+      <div class="p-3 bg-light border rounded">
+        <h4>Ad Requests Received</h4>
+        <p class="display-6">{{ total_requests }}</p>
+      </div>
     </div>
-    <div class="stat-box">
-        <h3>Total Earnings</h3>
-        <p>${{ total_earnings | round(2) }}</p>
+    <div class="col-md-3">
+      <div class="p-3 bg-light border rounded">
+        <h4>Total Revenue</h4>
+        <p class="display-6">${{ total_earnings | round(2) }}</p>
+      </div>
     </div>
-    <div class="stat-box">
-        <h3>Average Payment</h3>
-        <p>${{ avg_payment | round(2) }}</p>
+    <div class="col-md-3">
+      <div class="p-3 bg-light border rounded">
+        <h4>Average Earnings per Campaign</h4>
+        <p class="display-6">${{ avg_payment | round(2) }}</p>
+      </div>
     </div>
-    <div class="stat-box">
-        <h3>Unique Sponsors</h3>
-        <p>{{ unique_sponsors }}</p>
+    <div class="col-md-3">
+      <div class="p-3 bg-light border rounded">
+        <h4>Sponsors Engaged</h4>
+        <p class="display-6">{{ unique_sponsors }}</p>
+      </div>
     </div>
-</div>
+  </div>
 
-<h3>Ad Requests by Status</h3>
-<ul>
+  <h3>Ad Request Status Breakdown</h3>
+  <ul class="list-group mb-4">
     {% for status, count in requests_by_status.items() %}
-    <li>{{ status }}: {{ count }}</li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      {{ status }}
+      <span class="badge bg-primary rounded-pill">{{ count }}</span>
+    </li>
     {% endfor %}
-</ul>
+  </ul>
 
-<h3>Top 5 Campaigns by Payment</h3>
-<ol>
+  <h3>Top 5 Earning Campaigns</h3>
+  <ol class="list-group list-group-numbered">
     {% for campaign in top_campaigns %}
-    <li>{{ campaign.name }} (${{ campaign.payment_amount | round(2) }})</li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      {{ campaign.name }}
+      <span class="badge bg-success">${{ campaign.payment_amount | round(2) }}</span>
+    </li>
     {% endfor %}
-</ol>
-
+  </ol>
+</div>
 {% endblock %}
+
