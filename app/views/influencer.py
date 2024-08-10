@@ -100,14 +100,12 @@ def edit_profile():
 
     form = InfluencerProfileForm(obj=current_user)
 
-
     user = {
         "username": current_user.username,
         "niche": current_user.niche,
         "followers": len(current_user.followers),
         "category": current_user.category,
     }
-
 
     if form.validate_on_submit():
         current_user.username = form.name.data
@@ -118,7 +116,9 @@ def edit_profile():
         flash("Your profile has been updated.", "success")
         return redirect(url_for("influencer.view_profile"))
 
-    return render_template("influencer/edit_profile.html", form=form,user_info=user, user=current_user)
+    return render_template(
+        "influencer/edit_profile.html", form=form, user_info=user, user=current_user
+    )
 
 
 @influencer.route("/profile/<int:user_id>")
@@ -131,60 +131,62 @@ def public_profile(user_id):
     return render_template("influencer/public_profile.html", influencer=user)
 
 
-influencer = Blueprint("influencer", __name__)
-
 @influencer.route("/stats")
 @login_required
 def stats():
-    if current_user.role != 'influencer':
+    if current_user.role != "influencer":
         flash("Access denied. You must be an influencer to view these stats.", "danger")
-        return redirect(url_for('main.index'))
+        return redirect(url_for("main.home"))
 
     # Total number of ad requests
     total_requests = AdRequest.query.filter_by(influencer_id=current_user.id).count()
 
     # Ad requests by status
-    requests_by_status = db.session.query(
-        AdRequest.status, 
-        func.count(AdRequest.id)
-    ).filter_by(
-        influencer_id=current_user.id
-    ).group_by(AdRequest.status).all()
+    requests_by_status = (
+        db.session.query(AdRequest.status, func.count(AdRequest.id))
+        .filter_by(influencer_id=current_user.id)
+        .group_by(AdRequest.status)
+        .all()
+    )
 
     # Top 5 campaigns by payment amount
-    top_campaigns = db.session.query(
-        Campaign.name, 
-        AdRequest.payment_amount
-    ).join(AdRequest).filter(
-        AdRequest.influencer_id == current_user.id,
-        AdRequest.status == 'Accepted'
-    ).order_by(
-        AdRequest.payment_amount.desc()
-    ).limit(5).all()
+    top_campaigns = (
+        db.session.query(Campaign.name, AdRequest.payment_amount)
+        .join(AdRequest)
+        .filter(
+            AdRequest.influencer_id == current_user.id, AdRequest.status == "Accepted"
+        )
+        .order_by(AdRequest.payment_amount.desc())
+        .limit(5)
+        .all()
+    )
 
     # Total earnings
-    total_earnings = db.session.query(
-        func.sum(AdRequest.payment_amount)
-    ).filter_by(
-        influencer_id=current_user.id,
-        status='Accepted'
-    ).scalar() or 0
+    total_earnings = (
+        db.session.query(func.sum(AdRequest.payment_amount))
+        .filter_by(influencer_id=current_user.id, status="Accepted")
+        .scalar()
+        or 0
+    )
 
     # Average payment per accepted request
-    avg_payment = db.session.query(
-        func.avg(AdRequest.payment_amount)
-    ).filter_by(
-        influencer_id=current_user.id,
-        status='Accepted'
-    ).scalar() or 0
+    avg_payment = (
+        db.session.query(func.avg(AdRequest.payment_amount))
+        .filter_by(influencer_id=current_user.id, status="Accepted")
+        .scalar()
+        or 0
+    )
 
     # Number of unique sponsors worked with
-    unique_sponsors = db.session.query(
-        func.count(func.distinct(Campaign.sponsor_id))
-    ).join(AdRequest).filter(
-        AdRequest.influencer_id == current_user.id,
-        AdRequest.status == 'Accepted'
-    ).scalar() or 0
+    unique_sponsors = (
+        db.session.query(func.count(func.distinct(Campaign.sponsor_id)))
+        .join(AdRequest)
+        .filter(
+            AdRequest.influencer_id == current_user.id, AdRequest.status == "Accepted"
+        )
+        .scalar()
+        or 0
+    )
 
     return render_template(
         "influencer/stats.html",
@@ -194,5 +196,5 @@ def stats():
         top_campaigns=top_campaigns,
         total_earnings=total_earnings,
         avg_payment=avg_payment,
-        unique_sponsors=unique_sponsors
+        unique_sponsors=unique_sponsors,
     )
