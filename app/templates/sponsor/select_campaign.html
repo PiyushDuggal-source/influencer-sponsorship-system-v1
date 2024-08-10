@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Select Campaign for Ad Request</h2>
+  <h3 class="mb-4">Influencer: {{ influencer.username }}</h3>
+
+  <form method="POST" class="bg-light p-4 rounded shadow">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+    <div class="mb-3">
+      <label for="campaign_id" class="form-label">Select Campaign:</label>
+        <select name="campaign_id" id="campaign_id" class="form-select" required>
+        {% for campaign in campaigns %}
+        <option value="{{ campaign.id }}">
+          {{ campaign.name }} - {{ campaign.start_date.strftime('%Y-%m-%d') }} to {{ campaign.end_date.strftime('%Y-%m-%d') }} - ${{ "%.2f"|format(campaign.budget) }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Ad Request</button>
+  </form>
+</div>
+{% endblock %}
+

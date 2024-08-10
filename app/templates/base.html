@@ -10,6 +10,7 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -25,22 +26,75 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbar">
-        <div class="navbar-nav">
-         {% if user and user.is_authenticated %}
-          <a class="nav-item nav-link" id="home" href="/">Home</a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          {% if user and user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+            </li>
+
+            {% if user.role == "influencer" %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('influencer.view_profile') }}"><i class="fas fa-user"></i> Profile</a>
+            </li>
+            {% endif %}
+
+            {% if user.role == "sponsor" %}
+            <li class="nav-item">
+              <a class="nav-link" href="/sponsor/campaigns"><i class="fas fa-bullhorn"></i> Campaigns</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('sponsor.search_influencers') }}"><i class="fas fa-search"></i> Search Influencers</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('influencer.search_campaigns') }}"><i class="fas fa-search"></i> Search Campaigns</a>
+            </li>
+            {% endif %}
+
+
+            {% if user.role == "sponsor" %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('sponsor.stats') }}"><i class="fas fa-chart-line"></i> Stats</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('influencer.stats') }}"><i class="fas fa-chart-line"></i> Stats</a>
+            </li>
+            {% endif %}
           {% else %}
-          <a class="nav-item nav-link" id="login" href="/login">Login</a>
-          <a class="nav-item nav-link" id="signUp" href="/register">Register</a>
+            <li class="nav-item">
+              <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/register"><i class="fas fa-user-plus"></i> Register</a>
+            </li>
           {% endif %}
-        </div>
-      </div>
-      <div>
-          <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+        </ul>
+        {% if user and user.is_authenticated %}
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+          </ul>
+        {% endif %}
       </div>
     </nav>
 
-    <div>{% block content %}{% endblock %}</div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+          {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="container mt-4">
+      {% block content %}{% endblock %}
+    </div>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -49,3 +103,4 @@
     ></script>
   </body>
 </html>
+

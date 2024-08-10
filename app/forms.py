@@ -7,7 +7,7 @@ from wtforms import (
     FloatField,
     DateField,
     SelectField,
-    IntegerField,
+    DecimalField,
 )
 
 from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange
@@ -54,9 +54,65 @@ class CampaignForm(FlaskForm):
     )
 
 
+class InfluencerSearchForm(FlaskForm):
+    niche = SelectField(
+        "Niche",
+        choices=[
+            ("technology", "Technology"),
+            ("fashion", "Fashion"),
+            ("food", "Food"),
+            ("travel", "Travel"),
+            ("fitness", "Fitness"),
+            ("beauty", "Beauty"),
+            ("gaming", "Gaming"),
+            ("other", "Other"),
+        ],
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Search")
+
+
 class AdRequestForm(FlaskForm):
-    influencer_id = IntegerField("Influencer ID", validators=[DataRequired()])
     requirements = TextAreaField("Requirements", validators=[DataRequired()])
-    payment_amount = FloatField(
+    payment_amount = DecimalField(
         "Payment Amount", validators=[DataRequired(), NumberRange(min=0)]
     )
+    submit = SubmitField("Send Ad Request")
+
+
+class CampaignSearchForm(FlaskForm):
+    niche = SelectField(
+        "Niche",
+        choices=[
+            ("technology", "Technology"),
+            ("fashion", "Fashion"),
+            ("food", "Food"),
+            ("travel", "Travel"),
+            ("fitness", "Fitness"),
+            ("beauty", "Beauty"),
+            ("gaming", "Gaming"),
+            ("other", "Other"),
+        ],
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Search")
+
+
+class InfluencerProfileForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    category = StringField("Category", validators=[DataRequired()])
+    niche = SelectField(
+        "Niche",
+        choices=[
+            ("technology", "Technology"),
+            ("fashion", "Fashion"),
+            ("food", "Food"),
+            ("travel", "Travel"),
+            ("fitness", "Fitness"),
+            ("beauty", "Beauty"),
+            ("gaming", "Gaming"),
+            ("other", "Other"),
+        ],
+        validators=[DataRequired()],
+    )
+    submit = SubmitField("Update Profile")

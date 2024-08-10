@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Influencer Statistics</h2>
+
+<div class="stats-container">
+    <div class="stat-box">
+        <h3>Total Ad Requests</h3>
+        <p>{{ total_requests }}</p>
+    </div>
+    <div class="stat-box">
+        <h3>Total Earnings</h3>
+        <p>${{ total_earnings | round(2) }}</p>
+    </div>
+    <div class="stat-box">
+        <h3>Average Payment</h3>
+        <p>${{ avg_payment | round(2) }}</p>
+    </div>
+    <div class="stat-box">
+        <h3>Unique Sponsors</h3>
+        <p>{{ unique_sponsors }}</p>
+    </div>
+</div>
+
+<h3>Ad Requests by Status</h3>
+<ul>
+    {% for status, count in requests_by_status.items() %}
+    <li>{{ status }}: {{ count }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Top 5 Campaigns by Payment</h3>
+<ol>
+    {% for campaign in top_campaigns %}
+    <li>{{ campaign.name }} (${{ campaign.payment_amount | round(2) }})</li>
+    {% endfor %}
+</ol>
+
+{% endblock %}

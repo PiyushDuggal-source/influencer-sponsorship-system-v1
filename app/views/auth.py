@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from flask_login import login_user, logout_user, login_required, current_user
+from flask import flash, render_template, Blueprint, redirect, url_for, request
+from flask_login import login_user, logout_user, current_user
 from app.models.user import User
 from app import db
 from flask_wtf.csrf import generate_csrf
@@ -9,19 +9,17 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
-    # Login logic here
+    # redirect user if logged in
     if current_user.is_authenticated:
-        return redirect(url_for("main.home"))  # Redirect if user is already logged in
+        return redirect(url_for("main.home"))
 
     if request.method == "POST":
+        # Login logic here
         username = request.form.get("username")
         password = request.form.get("password")
         role = request.form.get("role")
 
-        print(username, password, role)
-
         user = User.query.filter_by(username=username, role=role).first()
-        print(user)
 
         if user and user.check_password(password):
             login_user(user)
@@ -42,7 +40,7 @@ def register():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
         role = request.form.get("role")
-        print(username, email, password, confirm_password, role)
+        niche = request.form.get("niche")
 
         user_by_username = User.query.filter_by(username=username).first()
 
@@ -59,7 +57,11 @@ def register():
             flash("Email address already exists", "warning")
             return redirect(url_for("auth.register"))
 
-        new_user = User(username=username, email=email, role=role)
+        if role == "influencer":
+            new_user = User(username=username, email=email, role=role, niche=niche)
+        else:
+            new_user = User(username=username, email=email, role=role)
+
         new_user.set_password(password)
 
         db.session.add(new_user)
@@ -71,16 +73,7 @@ def register():
     return render_template("signup.html", csrf_token=generate_csrf())
 
 
-@auth.route("/debug-users")
-def debug_users():
-    users = User.query.all()
-    print("users", users)
-
-    print(users)
-    return "Check your console for user data."
-
-
 @auth.route("/logout")
-def logout():
+def logout_the_user():
     logout_user()
     return redirect(url_for("main.home"))

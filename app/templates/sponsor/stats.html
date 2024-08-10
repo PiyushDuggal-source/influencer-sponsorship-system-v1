@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Sponsor Statistics</h2>
+
+  <div class="row text-center">
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-body">
+          <h3 class="card-title">Total Campaigns</h3>
+          <p class="card-text">{{ total_campaigns }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-body">
+          <h3 class="card-title">Total Budget</h3>
+          <p class="card-text">${{ total_budget }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-body">
+          <h3 class="card-title">Total Ad Requests</h3>
+          <p class="card-text">{{ total_ad_requests }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mt-5">Ad Requests by Status</h3>
+  <ul class="list-group">
+    {% for status, count in ad_requests_by_status.items() %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      {{ status }}
+      <span class="badge bg-primary rounded-pill">{{ count }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="mt-5">Top 5 Campaigns by Ad Requests</h3>
+  <ol class="list-group list-group-numbered">
+    {% for campaign in top_campaigns %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      {{ campaign.name }}
+      <span class="badge bg-secondary">{{ campaign.request_count }} requests</span>
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+{% endblock %}
+

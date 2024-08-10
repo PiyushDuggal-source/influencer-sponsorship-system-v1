@@ -9,9 +9,13 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False)
-    campaigns = db.relationship('Campaign', back_populates='sponsor')
-    # flagged = db.Column(db.Boolean, default=False)
+    campaigns = db.relationship("Campaign", back_populates="sponsor")
+    niche = db.Column(db.String(50))
+    followers = db.relationship(
+        "AdRequest",
+    )
 
+    category = db.Column(db.String(50))
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 

@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block content %}
+<h2>Send Ad Request</h2>
+<h3>Campaign: {{ campaign.name }}</h3>
+<h4>Influencer: {{ influencer.username }}</h4>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div>{{ form.requirements.label }} {{ form.requirements() }}</div>
+  <div>{{ form.payment_amount.label }} {{ form.payment_amount() }}</div>
+  {{ form.submit() }}
+</form>
+{% endblock %}

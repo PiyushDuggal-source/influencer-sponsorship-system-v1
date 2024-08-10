@@ -15,16 +15,15 @@ def create_app(config_class=Config):
 
     # Register blueprints
     from .views import auth, sponsor, influencer, admin, main
+
     app.register_blueprint(auth.auth)
     app.register_blueprint(sponsor.sponsor, url_prefix="/sponsor")
-    app.register_blueprint(influencer.influencer)
+    app.register_blueprint(influencer.influencer, url_prefix="/influencer")
     app.register_blueprint(main.main)
     app.register_blueprint(admin.admin)
 
-
     with app.app_context():
         db.create_all()
-
 
     # # Register API resources
     # api_ref.add_resource(CampaignListAPI, "/api/campaigns")

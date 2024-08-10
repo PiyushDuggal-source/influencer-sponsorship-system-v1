@@ -1,10 +1,12 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+
+{% block content %}
 <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
   <div class="row w-100">
     <div class="col-12 col-sm-8 col-md-6 col-lg-4 mx-auto">
       <main class="form-signup">
         <form class="d-flex flex-column gap-3" action="{{ url_for('auth.register') }}" method="post">
-<input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
           <h1 class="h3 mb-3 fw-normal text-center">Create an account</h1>
           <div class="form-floating">
             <input type="text" class="form-control" id="floatingUsername" name="username" placeholder="Username"
@@ -27,11 +29,29 @@
             <label for="floatingConfirmPassword">Confirm Password</label>
           </div>
 
-        <select class="form-select" aria-label="Default select example" name="role" id="role" required>
-          <option value="sponsor" selected>Sponsor</option>
-          <option value="influencer">Influencer</option>
-          <option value="admin">Admin</option>
-        </select>
+          <div class="form-floating">
+            <select class="form-select" aria-label="Default select example" name="role" id="role" required>
+              <option value="sponsor" selected>Sponsor</option>
+              <option value="influencer">Influencer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <label for="role">Role</label>
+          </div>
+
+          <div class="form-floating d-none" id="nicheField">
+            <select class="form-select" aria-label="Select Niche" name="niche" id="niche">
+              <option value="technology">Technology</option>
+              <option value="fashion">Fashion</option>
+              <option value="food">Food</option>
+              <option value="beauty">Beauty</option>
+              <option value="travel">Travel</option>
+              <option value="fitness">Fitness</option>
+              <option value="gaming">Gaming</option>
+              <option value="other">Other</option>
+            </select>
+            <label for="niche">Niche</label>
+          </div>
+
           <button class="btn btn-primary w-100 py-2" type="submit">
             Sign up
           </button>
@@ -43,4 +63,20 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const nicheField = document.getElementById('nicheField');
+
+    roleSelect.addEventListener('change', function() {
+      if (roleSelect.value === 'influencer') {
+        nicheField.classList.remove('d-none');
+      } else {
+        nicheField.classList.add('d-none');
+      }
+    });
+  });
+</script>
 {% endblock %}
+
